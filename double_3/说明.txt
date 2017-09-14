@@ -1,0 +1,168 @@
+/***************************** 一级程序 *****************************************************/
+1 MAIN.c
+      调用的接口
+  调用函数：
+
+1.1 MainInit.c
+       数据结构的初始化。
+       void Init(SPMultiply *SPMul, LinearSystem *LSystem, Info *info, int argc, char *argv[]);
+             初始化数据结构。
+                输入：argc, *argv[]
+                输出：*SPMul, *LSystem, *info,
+       包含函数：
+             void InitInfo(Info *info);
+                 初始化信息，如特征值数目等条件。
+             void InitData(SparseMatrix *A, Info *info, char *argv[]);
+                 读入数据。
+             void InitMul_System(SPMultiply *SPMul, LinearSystem *LSystem, SparseMatrix A, Info *info);
+                 初始化乘法计算算子以及线性系统计算算子。
+                  
+1.2 MainDivision.c
+
+      谱分割。
+       void Division(SPMultiply SPMul, LinearSystem LSystem, Info info);
+              谱分割。
+                输入：LSystem, SPMul,info
+                输出：info
+
+1.3 MainGeteig.c
+       特征值求解  
+       void Geteig(SPMultiply SPMul, LinearSystem LSystem, Info info);
+              特征值求解。
+                输入：LSystem, SPMul,info
+                输出：无  
+
+/************************** 二级程序 **********************************************************/
+
+
+DVGetCeig.c
+    盖尔圆估计特征值分布
+    DV_GetCeig(double *ceig, SPMultiply SPMul, Info info)
+           估计特征值分布。
+            输入：SPMul, info
+            输出：*ceig，
+    包含函数：
+         void Ger_setGerinfo(Gerinfo *Gerinfo, SPMultiply SPMul, Info info);
+             统计盖尔圆信息
+         void Ger_getGerinfo(Vector *Gerdot, Density *Gerdensity, Gerinfo Gerinfo);
+             计算特征值概率密度
+         void Ger_getCdensity(Density *cdensity, Density Gerdensity, Vector  Gerdot);
+              积分得特征值分布密度
+         void Ger_getCeig(double *ceig, int N, Density cdensity);
+               特征值分布的重构
+         void Ger_ModifyCeig(double *ceig, int N, double mineig);
+               最小特征值修正
+
+
+DVGetInterval.c
+     划分区间
+     void DV_GetInterval(double *ceig, Info info)
+            根据矩阵特征值的分布划分区间
+            输入：*ceig, info
+            输出：info
+
+
+
+DVGetNeig.c
+
+     估计区间内特征值数目。
+      int DV_GetNeig(SPMultiply SPMul, LinearSystem LSystem, Info info)
+             估计矩阵区间内特征值数目
+             输入：SPMul, LSystem, info
+             输出：info
+
+DVGetTag.c
+      判断分割结果是否满足要求
+       void DV_GetTag(int*tag, int neig_loc, int times, Info info)
+             判断分割结果是否满足要求。
+             输入：times, info
+             输出：*tag, neig_loc, times
+
+
+DVModify.c
+      重新估计矩阵特征值的分布
+       DV_Modify(int tag, double *ceig, Info info)
+              根据结果修正特征值的分布
+              输入：tag, *ceig, info
+              输出：*ceig
+        包含函数:
+              void Modify_Info(Info info);
+                    根据信息设定修正区间                 
+              void Modify_Ceig(double *ceig, Info info);
+                    修正特征值的分布
+              void Modify_Scal(Info info);
+                     设定下一步分割区间计算因子。
+
+DVEnd.c
+      结束谱分割。
+      DV_End(Info info)
+            设定一些参数，为了后续计算做准备。
+            输入：info
+            输出：info
+
+
+
+
+linearsystem.c
+	线性系统计算。	
+	void LS_InitRhs(LinearSystem LSystem, double *Q_loc, Info info)
+             右端项初始化。
+             输入:*Q_loc, info
+             输出：LSystem, 
+	void LS_InitLS(LinearSystem *LSystem, Info info)
+             线性系统初始化。
+             输入：*LSystem, info
+             输出：*LSystem, 
+
+mumps.c	
+	调用mumps接口
+	void Mumps_Init(ZMUMPS_STRUC_C *id, Info info)
+             初始化
+	void Mumps_Analize(ZMUMPS_STRUC_C *id, LinearSystem LSystem, Info info)
+             分析
+	void Mumps_Factor(ZMUMPS_STRUC_C *id)
+             分解
+	void Mumps_Solve(ZMUMPS_STRUC_C *id)
+             求解
+	void Mumps_End(ZMUMPS_STRUC_C *id)
+             结束
+
+
+feast.c	
+	特征值求解子程序
+	void Feast_SetRandomMatrix(double *Q_loc, Info info)
+             随机矩阵赋值
+              输入：info
+              输出：*Q_loc, 
+	void Feast_GetProjectionOp(double *Y_loc, LinearSystem linearsystem, Info info)
+             计算投影矩阵
+              输入：linearsystem, info
+              输出：*Y_loc, 
+	void Feast_Project(double *Q_loc, double *lambda, double *Y_loc, SPMultiply SPMul, Info info)
+             投影计算
+              输入：*Y_loc, SPMul, info
+              输出：*Q_loc, *lambda, 
+	void Feast_GetRes(double *maxres, double *lambda, double *Q_loc, SPMultiply SPMul, Info info)
+             误差计算
+              输入：*lambda, *Q_loc, SPMul, info
+              输出：*maxres, 
+	int  Feast_GetNumber(double *Y_loc, Info info)
+             计算特征值数目
+              输入：*Y_loc, info
+              输出：返回值
+
+mul.c
+     矩阵矩阵乘子程序
+	void mul(double *result, double *Y_loc, SPMultiply SPMul, Info info) 
+             稀疏矩阵乘法
+              输入：*Y_loc, SPMul, info
+              输出：*result, 
+
+orth.c
+     矩阵的正交子程序
+
+
+     void orth(double *Q_loc, double *Y_loc, Info info)
+             并行施密特正交
+              输入：*Y_loc, info
+              输出：*Q_loc, 

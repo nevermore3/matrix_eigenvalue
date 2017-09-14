@@ -1,0 +1,4 @@
+mpirun -np 8   ./out_0.009   ~/Data/laplace_50   | tee -a result009
+mpirun -np 8   ./out_0.010   ~/Data/laplace_50   | tee -a result010
+mpirun -np 8   ./out_0.015   ~/Data/laplace_50   | tee -a result015
+mpirun -np 8   ./out_0.02    ~/Data/laplace_50   | tee -a result02

@@ -1,0 +1,8 @@
+#BSUB -q cpu
+#BSUB -n 160
+#BSUB -o cpu.aaaa.160_2.out 
+#BSUB -e cpu.aaaa.err
+#BSUB -W 300
+mpijob.mvapich2 ./out_parmetis_1000_2 ~/Data/laplace_50
+
+

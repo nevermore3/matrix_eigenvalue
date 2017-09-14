@@ -1,0 +1,16 @@
+#BSUB -q mic
+#BSUB -W 120
+#BSUB -n 60
+#BSUB -o m60.out
+#BSUB -e m60.err
+LOGFILE=intelmpi.log
+nodefile="nodefile"
+echo $LSB_HOSTS|sed 's/\ /\n/g'|uniq -c |awk '{print $2":"$1}'>>$nodefile
+NP=`cat $nodefile|wc -l`
+echo my job id is $LSB_JOBID | tee -a  $LOGFILE
+echo run nodes is following: | tee -a $LOGFILE
+cat $nodefile | tee -a $LOGFILE
+echo begin time is `date` | tee -a $LOGFILE
+module load mpi/impi/4.1.3.049
+mpirun  -r ssh -f $nodefile ./out ~/Data/laplace_100 2>&1 | tee -a $LOGFILE
+ 
